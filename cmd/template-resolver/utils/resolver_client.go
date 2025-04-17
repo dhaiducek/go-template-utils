@@ -18,6 +18,7 @@ type TemplateResolver struct {
 	saveResources     string
 	// saveHubResources Output doesn't include "ManagedClusters" resources
 	saveHubResources string
+	skipValidation   bool
 }
 
 func (t *TemplateResolver) GetCmd() *cobra.Command {
@@ -87,6 +88,13 @@ func (t *TemplateResolver) GetCmd() *cobra.Command {
 			"This output can be used as input resources for the dry-run CLI or for local environment testing.",
 	)
 
+	templateResolverCmd.Flags().BoolVar(
+		&t.skipValidation,
+		"skip-validation",
+		false,
+		"Handle the input directly as a Go template, skipping any surrounding policy field validations.",
+	)
+
 	return templateResolverCmd
 }
 
@@ -124,8 +132,8 @@ func (t *TemplateResolver) resolveTemplates(cmd *cobra.Command, args []string) e
 		return fmt.Errorf("error handling YAML file input: %w", err)
 	}
 
-	resolvedYAML, err := ProcessTemplate(yamlBytes, t.hubKubeConfigPath,
-		t.clusterName, t.hubNamespace, t.objNamespace, t.objName, t.saveResources, t.saveHubResources)
+	resolvedYAML, err := ProcessTemplate(yamlBytes, t.hubKubeConfigPath, t.clusterName, t.hubNamespace,
+		t.objNamespace, t.objName, t.saveResources, t.saveHubResources, t.skipValidation)
 	if err != nil {
 		cmd.Printf("error processing templates: %s\n", err.Error())
 

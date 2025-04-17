@@ -87,7 +87,7 @@ func cliTest(testName string) func(t *testing.T) {
 		saveResources := filepath.Join(tmpDir, "save_resources.yaml")
 
 		resolvedYAML, err := utils.ProcessTemplate(inputBytes, kcPath, clusterName,
-			hubNS, objNamespace, objName, saveResources, saveHubResources)
+			hubNS, objNamespace, objName, saveResources, saveHubResources, false)
 		if err != nil {
 			if len(errorBytes) == 0 {
 				t.Fatal(err)
